@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div>
+
+    <header class="text-center text-bg-dark" style="padding-top: 30vh">
+        <h1>Initiative Tracker</h1>
+    </header>
+
+    {% if not request.user.is_authenticated %}
+    
+    <div class="d-flex justify-content-center mt-5">
+        <a href="{% url 'login' %}" class="btn btn-outline-success me-2" style="width: 15vw" role="button">
+            Login
+        </a>
+        <a href="{% url 'signup' %}" class="btn btn-success" style="width: 15vw" role="button">
+            Sign-up
+        </a>
+    </div>
+
+    {% else %}
+
+    <div class="d-flex justify-content-center mt-5">
+        <div>
+            <div class="py-1">
+                <a href="{% url 'tracker:list_trackers' %}" class="btn btn-outline-success me-2" style="width: 15vw" role="button">
+                    Start
+                </a>
+            </div>
+            <form class="py-1" method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button href="{% url 'logout' %}" class="btn btn-outline-danger me-2" style="width: 15vw" role="button">
+                    Logout
+                </button>
+            </form>
+        </div>
+    </div>
+
+    {%endif%}
+
+</div>
+{% endblock content %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header card-header-secondary">
+        <h4 class="card-title">
+            Trackers
+        </h4>
+        <a href="{% url 'tracker:create_tracker' %}" class="btn btn-outline-success me-2" style="width: 15vw" role="button">
+            Add more trackers
+        </a>
+    </div>
+    <ul>
+        {% for tracker in trackers %}
+            <li class="card-body">
+                <label class="mx-3 h5">{{ tracker.name }}</label> | 
+                <a href="{% url 'tracker:update_tracker' tracker.id %}" class="btn btn-outline-warning mx-3 add-creatures" type="button">Edit</a> |
+                <a href="{% url 'tracker:run' tracker.pk %}" class="btn btn-outline-success mx-3 add-creatures" type="button">Run</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock content %}

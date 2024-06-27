@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form enctype="multipart/form-data" class="container" method="post" id="tracker_form">
+    {% csrf_token %}
+    <div class="card">
+        <div class="card-head card-head-secondary">
+            <h4 class="card-title">
+                Add tracker
+            </h4>
+        </div>
+        {% for field in form %}
+            <div class="form-group card-body">
+                <label>{{ field.label }}</label>
+                {% if field.field.required %}
+                    <span style="color: red;" class="required">*</span>
+                {% endif %}
+
+                {{ field }}
+                {% if field.help_text %}
+                  <small style="color: gray;">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                  <p style="color: red;">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+    {% with named_formsets.creatures as formset %}
+        {{ formset.management_form }}
+        <script type="text/html" id="creatures-template">
+            <tr id="creatures-__prefix__" class=hide_all>
+                {% for fields in formset.empty_form.hidden_fields %}
+                    {{ fields }}
+                {% endfor %}
+
+                {% for fields in formset.empty_form.visible_fields %}
+                    <td>
+                        {{ fields }}
+                    </td>
+                {% endfor %}
+            </tr>
+        </script>
+        <div class="table-responsive card mt-4">
+            <div class="card-header card-header-secondary">
+                <h4 class="card-title">
+                    Add Creatures
+                </h4>
+            </div>
+            <table class="table card-header">
+                <thead class="text-secondary">
+                    <th>Name</th>
+                    <th>Initiative</th>
+                    <th>Delete?</th>
+                </thead>
+                <tbody id="item-creatures">
+                    {% for formss in formset %}
+                    {{ formss.management_form }}
+                    <tr id="creatures-{{ forloop.counter0 }}" class= hide_all>
+                        {{ formss.id }}
+                        {% for field in formss.visible_fields %}
+                            <td>
+                                {{ field }}
+                                {% for error in field.errors %}
+                                    <span style="color: red;">{{ error }}</span>
+                                {% endfor %}
+                            </td>
+                        {% endfor %}
+                        {% if formss.instance.pk %}
+                            <td>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal{{formss.instance.pk}}">
+                                    Delete
+                                </button>
+                                <div class="modal fade" id="exampleModal{{formss.instance.pk}}" tabindex="-1" aria-labelledby="exampleModalLabel{{formss.instance.pk}}" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel{{formss.instance.pk}}">
+                                                    Are You Sure You Want To Delete This?
+                                                </h5>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <a href="{% url 'tracker:delete_creature' formss.instance.pk %}" type="button" class="btn btn-primary">
+                                                    Yes, Delete
+                                                </a>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                    Close
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a href="#" id="add-creature-button" class="btn btn-outline-success me-2 add-creatures">Add More</a>
+        </div>
+    {% endwith %}
+    <div class="form-group d-flex justify-content-center mt-3">
+        <button type="submit" class="btn btn-outline-success me-2" style="width: 20%;">Submit</button>
+        <a href="{% url 'tracker:run' tracker.pk %}" class="btn btn-outline-success mx-3" style="width: 20%;" type="button">Run</a>
+    </div>
+</form>
+
+<script
+src="https://code.jquery.com/jquery-3.4.1.js"
+integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+crossorigin="anonymous"></script>
+
+<script>
+$(document).ready(function(){
+    $('.add-creatures').click(function(ev) {
+        ev.preventDefault();
+        var count = $('#item-creatures').children().length;
+        var tmplMarkup = $('#creatures-template').html();
+        var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
+        $('#item-creatures').append(compiledTmpl);
+
+        $('#id_creatures-TOTAL_FORMS').attr('value', count+1);
+    });
+});
+</script>
+
+{% endblock content %}
